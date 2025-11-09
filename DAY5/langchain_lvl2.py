@@ -11,7 +11,7 @@ SYSTEM_PROMPT = 'kamun adalah chatbot yandg ditugaskan membantuku...'
 
 prompt = ChatPromptTemplate([
     ('system', SYSTEM_PROMPT),
-    MessagesPlaceholder('chat_history') 
+    MessagesPlaceholder('chat_history'),
     ('human', '{input}')
 ])
 
@@ -27,17 +27,19 @@ def get_history(session_id):
         session_store[session_id] = InMemoryChatMessageHistory()
     return session_store[session_id]
 
+agent = RunnableWithMessageHistory(
+    chain,
+    get_history,
+    input_messages_key='input',
+    history_messages_key='chat_history'
+)
 
+#looping chat
+session_id = 'demo-level-2'
 
-
-
-
-
-
-
-#chat loop
 while True:
     user_text = input("\nYou : ").strip()
 
-    ai_message = chain.invoke({'input' : user_text})
+    ai_message = agent.invoke({'input' : user_text}, config=
+                                {'configurable': {'session_id' : session_id}})
     print(f'AI : {ai_message.content}')
